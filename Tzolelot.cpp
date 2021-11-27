@@ -1,20 +1,67 @@
 // Tzolelot.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
-
+#include <windows.h>
 #include <iostream>
+#include "Board.h"
+#include <iostream>
+#include "Node.h"
+#include "Player.h"
+
+using namespace std;
+Player player(true);
+Player Computer(false);
+
+
+int RandomNumber(int max)
+{
+	int randNum = (rand() % max);
+
+	return randNum;
+}
+
+void GameOver()
+{
+
+}
+
+void Gameloop() 
+{
+
+	// we should have like 4 functions that run in a loop,
+	// checking if the game is over
+	// asking the player to give input
+	// check the input and act accordinglly
+	// print the result
+}
+void SetStartingPlayer() 
+{
+	int random = RandomNumber(2);
+	Computer.MyTurn = random != 0;
+	if (random == 0)
+	{
+	player.MyTurn = true;
+	Computer.MyTurn = false;
+	cout << player.Name << " will start";
+	}
+	else 
+	{
+		player.MyTurn = false;
+		Computer.MyTurn = true;
+		cout << Computer.Name << " will start";
+	}
+}
+
+void InitGame()
+{
+	SetStartingPlayer();
+	Gameloop();
+}
+
 
 int main()
 {
-    std::cout << "Hello World!\n";
+	hConsole = GetStdHandle(STD_OUTPUT_HANDLE); //Coloring
+	srand(time(NULL));  // Random seed
+	InitGame();
+
 }
-
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
-
-// Tips for Getting Started: 
-//   1. Use the Solution Explorer window to add/manage files
-//   2. Use the Team Explorer window to connect to source control
-//   3. Use the Output window to see build output and other messages
-//   4. Use the Error List window to view errors
-//   5. Go to Project > Add New Item to create new code files, or Project > Add Existing Item to add existing code files to the project
-//   6. In the future, to open this project again, go to File > Open > Project and select the .sln file
