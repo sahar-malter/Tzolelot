@@ -15,6 +15,7 @@ public:
 	void init(Node(&gameBoard)[BoardSize][BoardSize]);
 	void Clear(Node(&gameBoard)[BoardSize][BoardSize]);
 	void Draw(Node(&gameBoard)[BoardSize][BoardSize]);
+	void Draw(Node(&gameBoard)[BoardSize][BoardSize],bool isPlayer);
 
 
 };

@@ -3,5 +3,8 @@
 Ship::Ship(int size)
 {
 	Size = size;
-    shipStatEnum = ShipStatEnum::Notdeployed;
+	shipStatEnum = ShipStatEnum::Notdeployed;
+	shipOriEnum = ShipOriEnum::down;
 }
+
+

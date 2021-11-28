@@ -1,4 +1,5 @@
 #pragma once
+#include "Node.h"
 
 enum class ShipStatEnum
 	{
@@ -20,5 +21,7 @@ public:
 	int Size;
 	ShipStatEnum shipStatEnum;
 	ShipOriEnum shipOriEnum;
+	Node ShipNodes[5];
 };
+
 
