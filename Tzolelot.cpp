@@ -22,12 +22,6 @@ enum class GameState
 };
 GameState gameState;
 
-int RandomNumber(int max)
-{
-	int randNum = (rand() % max);
-
-	return randNum;
-}
 
 void DrawBoards()
 {
@@ -49,7 +43,7 @@ void GameOver()
 
 void SetStartingPlayer()
 {
-	int random = RandomNumber(2);
+	int random = Computer.RandomNumber(2);
 	Computer.MyTurn = random != 0;
 	if (random == 0)
 	{
@@ -65,242 +59,48 @@ void SetStartingPlayer()
 	}
 }
 
-bool isPlacmentOver(Player& currentPlayer)
+void BattleLoop() 
 {
-	bool PlacmentOver = true;
-	for (int i = 0; i < (sizeof(currentPlayer.smallShips) / sizeof(currentPlayer.smallShips[0])); i++)
+	if (gameState != GameState::battle)
 	{
-		if (currentPlayer.smallShips[i].shipStatEnum == ShipStatEnum::Notdeployed)
-			return false;
+		Gameloop();
 	}
-	for (int i = 0; i < (sizeof(currentPlayer.mediumShips) / sizeof(currentPlayer.mediumShips[0])); i++)
+	if (!player.HasRemainningShips() || !Computer.HasRemainningShips()) 
 	{
-		if (currentPlayer.mediumShips[i].shipStatEnum == ShipStatEnum::Notdeployed)
-			return false;
+		gameState = GameState::over;
+		Gameloop();
 	}
-	for (int i = 0; i < (sizeof(currentPlayer.largeShips) / sizeof(currentPlayer.largeShips[0])); i++)
-	{
-		if (currentPlayer.largeShips[i].shipStatEnum == ShipStatEnum::Notdeployed)
-			return false;
-	}
-	for (int i = 0; i < (sizeof(currentPlayer.xlShips) / sizeof(currentPlayer.xlShips[0])); i++)
-	{
-		if (currentPlayer.xlShips[i].shipStatEnum == ShipStatEnum::Notdeployed)
-			return false;
-	}
-	return PlacmentOver;
-}
-
-bool IsShipFitInBoard(int x, int y, int size, ShipOriEnum shipOriEnum, Player& currentPlayer)
-{
-	bool FitInBoards = true;
-	switch (shipOriEnum)
-	{
-	case ShipOriEnum::up:
-		
-		if (x - size < 0)
-		{
-			FitInBoards = false;
-			break;
-		}
-		for (int i = 0; i < size; i++)
-		{
-			if (currentPlayer.PlayerBoard.GameBoard[x - i][y].nodeStatEnum != NodeStatEnum::empty) 
-			{
-				FitInBoards = false;
-				break;
-			}
-		}
-		break;
-	case ShipOriEnum::down:
-
-		if (x + size >= BoardSize)
-		{
-			FitInBoards = false;
-			break;
-		}
-		for (int i = 0; i < size; i++)
-		{
-			if (currentPlayer.PlayerBoard.GameBoard[x + i][y].nodeStatEnum != NodeStatEnum::empty)
-			{
-				FitInBoards = false;
-				break;
-			}
-		}
-		break;
-	case ShipOriEnum::left:
-
-		if (y - size < 0)
-		{
-			FitInBoards = false;
-			break;
-		}
-		for (int i = 0; i < size; i++)
-		{
-			if (currentPlayer.PlayerBoard.GameBoard[x][y - i].nodeStatEnum != NodeStatEnum::empty)
-			{
-				FitInBoards = false;
-				break;
-			}
-		}
-		break;
-	case ShipOriEnum::right:
-
-		if (y + size >= BoardSize)
-		{
-			FitInBoards = false;
-			break;
-		}
-		for (int i = 0; i < size; i++)
-		{
-			if (currentPlayer.PlayerBoard.GameBoard[x][y + i].nodeStatEnum != NodeStatEnum::empty)
-			{
-				FitInBoards = false;
-				break;
-			}
-		}
-		break;
-	}
-
-	return FitInBoards;
-}
-
-void PlaceShipRandomlly(Player& currentPlayer)
-{
-	int randomX = RandomNumber(BoardSize);
-	int randomY = RandomNumber(BoardSize);
-
-	for (int i = 0; i < (sizeof(currentPlayer.smallShips) / sizeof(currentPlayer.smallShips[0])); i++)
-	{
-		if (currentPlayer.smallShips[i].shipStatEnum == ShipStatEnum::Notdeployed)
-		{
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.smallShips[i].Size, ShipOriEnum::up, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.smallShips[i], ShipOriEnum::up, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.smallShips[i].Size, ShipOriEnum::down, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.smallShips[i], ShipOriEnum::down, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.smallShips[i].Size, ShipOriEnum::right, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.smallShips[i], ShipOriEnum::right, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.smallShips[i].Size, ShipOriEnum::left, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.smallShips[i], ShipOriEnum::left, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-
-		}
-	}
-	for (int i = 0; i < (sizeof(currentPlayer.mediumShips) / sizeof(currentPlayer.mediumShips[0])); i++)
-	{
-		if (currentPlayer.mediumShips[i].shipStatEnum == ShipStatEnum::Notdeployed)
-		{
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.mediumShips[i].Size, ShipOriEnum::up, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.mediumShips[i], ShipOriEnum::up, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.mediumShips[i].Size, ShipOriEnum::down, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.mediumShips[i], ShipOriEnum::down, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.mediumShips[i].Size, ShipOriEnum::right, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.mediumShips[i], ShipOriEnum::right, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.mediumShips[i].Size, ShipOriEnum::left, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.mediumShips[i], ShipOriEnum::left, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-		}
-	}
-	for (int i = 0; i < (sizeof(currentPlayer.largeShips) / sizeof(currentPlayer.largeShips[0])); i++)
-	{
-		if (currentPlayer.largeShips[i].shipStatEnum == ShipStatEnum::Notdeployed)
-		{
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.largeShips[i].Size, ShipOriEnum::up, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.largeShips[i], ShipOriEnum::up, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.largeShips[i].Size, ShipOriEnum::down, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.largeShips[i], ShipOriEnum::down, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.largeShips[i].Size, ShipOriEnum::right, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.largeShips[i], ShipOriEnum::right, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.largeShips[i].Size, ShipOriEnum::left, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.largeShips[i], ShipOriEnum::left, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-
-		}
-	}
-	for (int i = 0; i < (sizeof(currentPlayer.xlShips) / sizeof(currentPlayer.xlShips[0])); i++)
-	{
-		if (currentPlayer.xlShips[i].shipStatEnum == ShipStatEnum::Notdeployed)
-		{
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.xlShips[i].Size, ShipOriEnum::up, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.xlShips[i], ShipOriEnum::up, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.xlShips[i].Size, ShipOriEnum::down, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.xlShips[i], ShipOriEnum::down, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.xlShips[i].Size, ShipOriEnum::right, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.xlShips[i], ShipOriEnum::right, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-			if (IsShipFitInBoard(randomX, randomY, currentPlayer.xlShips[i].Size, ShipOriEnum::left, currentPlayer))
-			{
-				currentPlayer.placeShip(randomX, randomY, currentPlayer.xlShips[i], ShipOriEnum::left, currentPlayer.PlayerBoard.GameBoard);
-				return;
-			}
-		}
-	}
-	PlaceShipsLoop();
+	DrawBoards();
 }
 
 void PlaceShipsLoop()
 {
-	if (gameState != GameState::Placment) 
+	if (gameState != GameState::Placment)
 	{
 		Gameloop();
 	}
 
-	if (isPlacmentOver(Computer))
+	if (!Computer.isPlacementOver(false))
 	{
-		DrawBoards();
+		Computer.PlaceShipRandomlly();
 	}
-	else 
+	if (!player.isPlacementOver(false))
 	{
-		PlaceShipRandomlly(Computer);
+		player.ChooseShipToPlace();
 	}
+	else
+	{
+		gameState = GameState::battle;
+		Gameloop();
+	}
+	PlaceShipsLoop();
+
 
 }
 
 void InitGame()
 {
 	SetStartingPlayer();
-	cout << "Press any key";
 	system("pause");
 	DrawBoards();
 	gameState = GameState::Placment;
@@ -320,6 +120,7 @@ void Gameloop()
 			PlaceShipsLoop();
 			break;
 		case GameState::battle:
+			BattleLoop();
 			break;
 		case GameState::over:
 			GameOver();

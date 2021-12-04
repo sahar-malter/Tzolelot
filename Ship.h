@@ -22,6 +22,7 @@ public:
 	ShipStatEnum shipStatEnum;
 	ShipOriEnum shipOriEnum;
 	Node ShipNodes[5];
+	void clear();
 };
 
 

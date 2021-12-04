@@ -59,7 +59,7 @@ void Board::Draw(Node(&gameBoard)[BoardSize][BoardSize],bool isPlayer )
 				SetConsoleTextAttribute(hConsole, 7);
 				cout << "[";
 				SetConsoleTextAttribute(hConsole, 2);
-				cout << "1";
+				cout << "@";
 				SetConsoleTextAttribute(hConsole, 7);
 				cout << "]";
 				break;
@@ -67,7 +67,7 @@ void Board::Draw(Node(&gameBoard)[BoardSize][BoardSize],bool isPlayer )
 				SetConsoleTextAttribute(hConsole, 7);
 				cout << "[";
 				SetConsoleTextAttribute(hConsole, 8);
-				cout << "2";
+				cout << "~";
 				SetConsoleTextAttribute(hConsole, 7);
 				cout << "]";
 				break;
