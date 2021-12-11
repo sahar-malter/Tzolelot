@@ -32,7 +32,7 @@ void DrawBoards()
 	player.PlayerBoard.Draw(player.PlayerBoard.GameBoard, true);
 	cout << endl;
 	cout << "        Computer Board" << endl;
-	Computer.PlayerBoard.Draw(Computer.PlayerBoard.GameBoard, true); // should be false to hide the computer ships
+	Computer.PlayerBoard.Draw(Computer.PlayerBoard.GameBoard, false); // should be false to hide the computer ships
 	
 
 }
@@ -189,7 +189,6 @@ void Gameloop()
 	
 
 }
-
 
 int main()
 {
