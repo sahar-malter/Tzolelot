@@ -15,18 +15,23 @@ public:
 	Ship xlShips[1] { 5 };
 	Board PlayerBoard;
 	bool IsHuman;
+	bool shouldPlayAgain;
+	bool myTurn;
 	std::string Name;
-	bool MyTurn = false;
 
-	void placeShip(int x, int y, Ship(&shipToPlace), ShipOriEnum shipOriEnum, Node(&gameBoard)[BoardSize][BoardSize]);
-	bool HasRemainningShips();
-	void MarkUnplacable(int x, int y, Node(&gameBoard)[BoardSize][BoardSize]);
-	bool isPlacementOver(bool ShouldReport);
-	void PlaceShipRandomlly();
-	bool IsShipFitInBoard(int x, int y, int size, ShipOriEnum shipOriEnum);
-	int RandomNumber(int max);
-	void HandlePlayerInput(Ship(&shipToPlace));
+	void placeShip(int x, int y, Ship(&shipToPlace), ShipOriEnum shipOriEnum, Node(&gameBoard)[BoardSize][BoardSize]); // place ship on the board
+	bool HasRemainningShips(); // checks if any ship is still alive 
+	void MarkUnplacable(int x, int y, Node(&gameBoard)[BoardSize][BoardSize]); // iterate around a given node and mark all the unplacable places around it
+	void MarkAttempted(Ship(&shipToMarkAround), Node(&gameBoard)[BoardSize][BoardSize]); // iterate around a given ships nodes and mark all the attempted (cant bomb there) places around it
+	bool isPlacementOver(bool ShouldReport); // is there any ships left to place on the board?
+	void PlaceShipRandomlly(); // computer place ships on board algoritem 
+	bool IsShipFitInBoard(int x, int y, int size, ShipOriEnum shipOriEnum); // is the ship given is in the bounds of the game?
+	int RandomNumber(int max); // return a randome number from 0 up to given int
+	void HandlePlayerInput(Ship(&shipToPlace)); // checks all the player input when placing ships and act accordinglly 
 	void ChooseShipToPlace();
-	void RunOverShipsToRemark();
+	void RunOverShipsToRemark(); // iterate over all the ships and call "MarkUnplacable", this enable to place a ship you allready placed
+	void GuessPointOnBoard(Node(&gameBoard)[BoardSize][BoardSize], Player(&otherPlayer)); // computer guessing random places on board
+	void HandleHit(int x, int y, Node(&gameBoard)[BoardSize][BoardSize], Player(&otherPlayer)); // when either side hit the other, handle all that
+	void ChooseNodeToHit(Player(&otherPlayer)); // player input handeling when in battle
 };
 

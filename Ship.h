@@ -23,6 +23,8 @@ public:
 	ShipOriEnum shipOriEnum;
 	Node ShipNodes[5];
 	void clear();
+	bool IsAlive();// has any unhit nodes?
+	bool IsHitOnThisShip(int x, int y);// recive x and y to check if this ship nodes match them, if yes then this ship is hit. 
 };
 
 

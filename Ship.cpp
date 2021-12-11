@@ -17,4 +17,34 @@ void Ship::clear()
 	}
 }
 
+bool Ship::IsAlive() 
+{
+	bool isAlive = false;
+	for (int i = 0; i < Size; i++)
+	{
+		if (ShipNodes[i].nodeStatEnum != NodeStatEnum::hit) 
+		{
+			isAlive = true;
+		}
+	}
+	shipStatEnum = isAlive ?  ShipStatEnum::alive : ShipStatEnum::destroyed;
+	return isAlive;
+} 
+
+bool Ship::IsHitOnThisShip(int x, int y) 
+{
+	bool isHitOnThisShip = false;
+	for (int i = 0; i < Size; i++)
+	{
+		if (ShipNodes[i].X == x && ShipNodes[i].Y == y)
+		{
+			ShipNodes[i].nodeStatEnum = NodeStatEnum::hit;
+			isHitOnThisShip = true;
+		}
+	}
+	return isHitOnThisShip;
+
+}
+
+
 

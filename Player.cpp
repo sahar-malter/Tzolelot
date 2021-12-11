@@ -77,6 +77,7 @@ bool Player::HasRemainningShips()
 		if (xlShips[i].shipStatEnum == ShipStatEnum::alive)
 			HasShips = true;
 	}
+	
 	return HasShips;
 }
 
@@ -125,6 +126,7 @@ bool Player::isPlacementOver(bool ShouldReport)
 
 	if (ShouldReport) 
 	{
+		cout << "\n";
 		if(PlacmentOver) cout << "no ships to place\n\n";
 		else cout << "remaining to place\n\n";
 	}
@@ -222,9 +224,9 @@ void Player::HandlePlayerInput(Ship(&shipToPlace))
 	SetConsoleTextAttribute(hConsole, 7);
 
 
-	int x;
-	int y;
-	ShipOriEnum direction;
+	int x = -1;
+	int y = -1;
+	ShipOriEnum direction = ShipOriEnum::up;
 	int input = -1;
 	
 		cout << "Please enter the X coordinate. (From 0 - 9) \n";
@@ -640,6 +642,49 @@ void Player::MarkUnplacable(int x, int y, Node(&gameBoard)[BoardSize][BoardSize]
 		gameBoard[x][y - 1].nodeStatEnum = NodeStatEnum::unplacable;
 	}
 }
+
+void Player::MarkAttempted(Ship(&shipToMarkAround), Node(&gameBoard)[BoardSize][BoardSize])
+{
+	for (int i = 0; i < shipToMarkAround.Size ; i++)
+	{
+		int x = shipToMarkAround.ShipNodes[i].X;
+		int y = shipToMarkAround.ShipNodes[i].Y;
+
+		if (x - 1 >= 0 && gameBoard[x - 1][y].nodeStatEnum != NodeStatEnum::hit)
+		{
+			gameBoard[x - 1][y].nodeStatEnum = NodeStatEnum::attempted;
+		}
+		if (x + 1 <= BoardSize && gameBoard[x + 1][y].nodeStatEnum != NodeStatEnum::hit)
+		{
+			gameBoard[x + 1][y].nodeStatEnum = NodeStatEnum::attempted;
+		}
+		if (y - 1 >= 0 && x - 1 >= 0 && gameBoard[x - 1][y - 1].nodeStatEnum != NodeStatEnum::hit)
+		{
+			gameBoard[x - 1][y - 1].nodeStatEnum = NodeStatEnum::attempted;
+		}
+		if (y + 1 < BoardSize && x + 1 <= BoardSize && gameBoard[x + 1][y + 1].nodeStatEnum != NodeStatEnum::hit)
+		{
+			gameBoard[x + 1][y + 1].nodeStatEnum = NodeStatEnum::attempted;
+		}
+		if (y + 1 < BoardSize && x - 1 >= 0 && gameBoard[x - 1][y + 1].nodeStatEnum != NodeStatEnum::hit)
+		{
+			gameBoard[x - 1][y + 1].nodeStatEnum = NodeStatEnum::attempted;
+		}
+		if (y - 1 >= 0 && x + 1 <= BoardSize && gameBoard[x + 1][y - 1].nodeStatEnum != NodeStatEnum::hit)
+		{
+			gameBoard[x + 1][y - 1].nodeStatEnum = NodeStatEnum::attempted;
+		}
+		if (y + 1 < BoardSize && gameBoard[x][y + 1].nodeStatEnum != NodeStatEnum::hit)
+		{
+			gameBoard[x][y + 1].nodeStatEnum = NodeStatEnum::attempted;
+		}
+		if (y - 1 >= 0 && gameBoard[x][y - 1].nodeStatEnum != NodeStatEnum::hit)
+		{
+			gameBoard[x][y - 1].nodeStatEnum = NodeStatEnum::attempted;
+		}
+	}
+}
+
 void Player::RunOverShipsToRemark()
 {
 	for (int i = 0; i < (sizeof(smallShips) / sizeof(smallShips[0])); i++)
@@ -683,5 +728,203 @@ void Player::RunOverShipsToRemark()
 		}
 	}
 }
+
+void Player::GuessPointOnBoard(Node(&gameBoard)[BoardSize][BoardSize], Player(&otherPlayer))
+{
+	int randomX = RandomNumber(BoardSize);
+	int randomY = RandomNumber(BoardSize);
+	switch (gameBoard[randomX][randomY].nodeStatEnum)
+	{
+	case NodeStatEnum::attempted:
+		GuessPointOnBoard(gameBoard, otherPlayer);
+		break;
+	case NodeStatEnum::hit:
+		GuessPointOnBoard(gameBoard, otherPlayer);
+		break;
+	case NodeStatEnum::empty:
+		gameBoard[randomX][randomY].nodeStatEnum = NodeStatEnum::attempted;
+		shouldPlayAgain = false;
+				SetConsoleTextAttribute(hConsole, 15);
+		cout << Name << " Has hit an empty node" << " X " << randomX << " Y " << randomY <<"\n";
+				SetConsoleTextAttribute(hConsole, 7);
+		break;
+	case NodeStatEnum::unplacable:
+				SetConsoleTextAttribute(hConsole, 15);
+		cout << Name << " Has hit an empty node" << " X " << randomX << " Y " << randomY <<"\n";
+				SetConsoleTextAttribute(hConsole, 7);
+		gameBoard[randomX][randomY].nodeStatEnum = NodeStatEnum::attempted;
+		shouldPlayAgain = false;
+		break;
+	case NodeStatEnum::ocupied: //HIT!
+		gameBoard[randomX][randomY].nodeStatEnum = NodeStatEnum::hit;
+		HandleHit(randomX, randomY, gameBoard, otherPlayer);
+		shouldPlayAgain = true;
+		break;
+	default:
+		break;
+	}
+
+}
+
+void Player::ChooseNodeToHit(Player(&otherPlayer))
+{
+
+	int x = -1;
+	int y = -1;
+	int input = -1;
+
+	cout << "Please enter the X coordinate. (From 0 - 9) \n";
+
+	cin >> input;
+	if (input >= 0 && input < BoardSize)
+	{
+		x = (int)input;
+		cout << "Great lets continue,\n";
+	}
+	else
+	{
+		SetConsoleTextAttribute(hConsole, 4);
+		cout << "YOU MADE A MISTAKE !!!!, \n";
+		SetConsoleTextAttribute(hConsole, 7);
+		cout << "Please try again... ^^ \n";
+		system("pause");
+	}
+
+	cout << "Please enter the Y coordinate. (From 0 - 9) \n";
+
+	cin >> input;
+
+	if (input >= 0 && input < BoardSize)
+	{
+		y = (int)input;
+	}
+	else
+	{
+		SetConsoleTextAttribute(hConsole, 4);
+		cout << "YOU MADE A MISTAKE !!!!, \n";
+		SetConsoleTextAttribute(hConsole, 7);
+		cout << "Please try again... ^^ \n";
+		system("pause");
+	}
+	switch (otherPlayer.PlayerBoard.GameBoard[x][y].nodeStatEnum)
+	{
+	case NodeStatEnum::attempted:
+	case NodeStatEnum::hit:
+		SetConsoleTextAttribute(hConsole, 4);
+		cout << "YOU ALREADY BOMBED THIS NODE !!!!, \n";
+		SetConsoleTextAttribute(hConsole, 7);
+		cout << "Please try again... ^^ \n";
+		ChooseNodeToHit(otherPlayer);
+		break;
+	case NodeStatEnum::empty:
+		otherPlayer.PlayerBoard.GameBoard[x][y].nodeStatEnum = NodeStatEnum::attempted;
+		shouldPlayAgain = false;
+		SetConsoleTextAttribute(hConsole, 15);
+		cout <<Name << " Has hit an empty node" << " X " << x << " Y " << y << "\n";
+		SetConsoleTextAttribute(hConsole, 7);
+		break;
+	case NodeStatEnum::unplacable:
+		SetConsoleTextAttribute(hConsole, 15);
+		cout << Name << " Has hit an empty node" << " X " << x << " Y " << y << "\n";
+		SetConsoleTextAttribute(hConsole, 7);
+		otherPlayer.PlayerBoard.GameBoard[x][y].nodeStatEnum = NodeStatEnum::attempted;
+		shouldPlayAgain = false;
+		break;
+	case NodeStatEnum::ocupied: //HIT!
+		otherPlayer.PlayerBoard.GameBoard[x][y].nodeStatEnum = NodeStatEnum::hit;
+		HandleHit(x, y, otherPlayer.PlayerBoard.GameBoard, otherPlayer);
+		shouldPlayAgain = true;
+		break;
+	default:
+		break;
+	}
+
+}
+
+void Player::HandleHit(int x, int y, Node(&gameBoard)[BoardSize][BoardSize], Player(&otherPlayer))
+{
+	for (int i = 0; i < (sizeof(smallShips) / sizeof(smallShips[0])); i++)
+	{
+		if (otherPlayer.smallShips[i].IsHitOnThisShip(x, y))
+		{
+			if (otherPlayer.smallShips[i].IsAlive())
+			{
+				SetConsoleTextAttribute(hConsole, 15);
+				cout << Name << " Has hit a ship" << " X " << x << " Y " << y << "\n";
+				SetConsoleTextAttribute(hConsole, 7);
+				break;
+			}
+			else
+			{
+				SetConsoleTextAttribute(hConsole, 14);
+				cout <<Name << " Has destroyed a size "  << otherPlayer.smallShips[i].Size <<" ship" << "\n";
+				SetConsoleTextAttribute(hConsole, 7);
+				MarkAttempted(otherPlayer.smallShips[i], gameBoard);
+			}
+		}
+	}
+	for (int i = 0; i < (sizeof(mediumShips) / sizeof(mediumShips[0])); i++)
+	{
+		if (otherPlayer.mediumShips[i].IsHitOnThisShip(x, y))
+		{
+			if (otherPlayer.mediumShips[i].IsAlive())
+			{
+				SetConsoleTextAttribute(hConsole, 15);
+				cout << Name << " Has hit a ship" << " X " << x << " Y " << y << "\n";
+				SetConsoleTextAttribute(hConsole, 7);
+				break;
+			}
+			else
+			{
+				SetConsoleTextAttribute(hConsole, 14);
+				cout << Name << " Has destroyed a size " << otherPlayer.mediumShips[i].Size << " ship" << "\n";
+				MarkAttempted(otherPlayer.mediumShips[i], gameBoard);
+				SetConsoleTextAttribute(hConsole, 7);
+			}
+		}
+	}
+	for (int i = 0; i < (sizeof(largeShips) / sizeof(largeShips[0])); i++)
+	{
+		if (otherPlayer.largeShips[i].IsHitOnThisShip(x, y))
+		{
+			if (otherPlayer.largeShips[i].IsAlive())
+			{
+				SetConsoleTextAttribute(hConsole, 15);
+				cout << Name << " Has hit a ship" << " X " << x << " Y " << y << "\n";
+				SetConsoleTextAttribute(hConsole, 7);
+				break;
+			}
+			else
+			{
+				SetConsoleTextAttribute(hConsole, 14);
+				cout << Name << " Has destroyed a size " << otherPlayer.largeShips[i].Size << " ship" << "\n";
+				MarkAttempted(otherPlayer.largeShips[i], gameBoard);
+			}
+				SetConsoleTextAttribute(hConsole, 7);
+		}
+	}
+	for (int i = 0; i < (sizeof(xlShips) / sizeof(xlShips[0])); i++)
+	{
+		if (otherPlayer.xlShips[i].IsHitOnThisShip(x, y))
+		{
+			if (otherPlayer.xlShips[i].IsAlive())
+			{
+				SetConsoleTextAttribute(hConsole, 15);
+				cout << Name << " Has hit a ship" << " X " << x << " Y " << y << "\n";
+				SetConsoleTextAttribute(hConsole, 7);
+				break;
+			}
+			else
+			{
+				SetConsoleTextAttribute(hConsole, 14);
+				cout << Name << " Has destroyed a size " << otherPlayer.xlShips[i].Size << " ship" << "\n";
+				MarkAttempted(otherPlayer.xlShips[i], gameBoard);
+			}
+				SetConsoleTextAttribute(hConsole, 7);
+		}
+	}
+
+
+ }
 
 

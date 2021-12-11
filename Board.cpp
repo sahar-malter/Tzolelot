@@ -75,7 +75,15 @@ void Board::Draw(Node(&gameBoard)[BoardSize][BoardSize],bool isPlayer )
 				SetConsoleTextAttribute(hConsole, 7);
 				cout << "[";
 				SetConsoleTextAttribute(hConsole, 4);
-				cout << "3";
+				cout << "@";
+				SetConsoleTextAttribute(hConsole, 7);
+				cout << "]";
+				break;
+			case NodeStatEnum::attempted:
+				SetConsoleTextAttribute(hConsole, 7);
+				cout << "[";
+				SetConsoleTextAttribute(hConsole, 14);
+				cout << "*";
 				SetConsoleTextAttribute(hConsole, 7);
 				cout << "]";
 				break;
@@ -122,8 +130,16 @@ void Board::Draw(Node(&gameBoard)[BoardSize][BoardSize],bool isPlayer )
 				case NodeStatEnum::hit:
 					SetConsoleTextAttribute(hConsole, 7);
 					cout << "[";
-					SetConsoleTextAttribute(hConsole, 6);
-					cout << "3";
+					SetConsoleTextAttribute(hConsole, 4);
+					cout << "@";
+					SetConsoleTextAttribute(hConsole, 7);
+					cout << "]";
+					break;
+				case NodeStatEnum::attempted:
+					SetConsoleTextAttribute(hConsole, 7);
+					cout << "[";
+					SetConsoleTextAttribute(hConsole, 14);
+					cout << "*";
 					SetConsoleTextAttribute(hConsole, 7);
 					cout << "]";
 					break;

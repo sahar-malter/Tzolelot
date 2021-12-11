@@ -5,7 +5,8 @@ enum class NodeStatEnum
 		empty = 0,
 		ocupied = 1,
 		unplacable = 2,
-		hit = 3
+		hit = 3,
+		attempted = 4
 	};
 
 class Node

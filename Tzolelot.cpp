@@ -10,6 +10,7 @@
 using namespace std;
 Player player(true);
 Player Computer(false);
+//Player& currentPlayer = player;
 void Gameloop();
 void PlaceShipsLoop();
 
@@ -32,45 +33,96 @@ void DrawBoards()
 	cout << endl;
 	cout << "        Computer Board" << endl;
 	Computer.PlayerBoard.Draw(Computer.PlayerBoard.GameBoard, true); // should be false to hide the computer ships
-	system("pause");
+	
 
 }
 
 void GameOver()
 {
-
+	cout << "Game Over, thank god..." << endl;
+	system("pause");
+	return;
 }
 
 void SetStartingPlayer()
 {
 	int random = Computer.RandomNumber(2);
-	Computer.MyTurn = random != 0;
 	if (random == 0)
 	{
-		player.MyTurn = true;
-		Computer.MyTurn = false;
+		player.myTurn = true;
+		Computer.myTurn = false;
 		cout << player.Name << " will start" << endl;
 	}
 	else
 	{
-		player.MyTurn = false;
-		Computer.MyTurn = true;
+		player.myTurn = false;
+		Computer.myTurn = true;
 		cout << Computer.Name << " will start" << endl;
 	}
 }
 
+void HandleTurns() 
+{
+	if (player.myTurn)
+	{
+		if (player.shouldPlayAgain)
+		{
+			player.shouldPlayAgain = false;
+			player.myTurn = true;
+			Computer.myTurn = false;
+		}
+		else 
+		{
+			player.myTurn = false;
+			Computer.myTurn = true;
+		}
+	}
+	else
+	{
+		if (Computer.shouldPlayAgain)
+		{
+			Computer.shouldPlayAgain = false;
+			Computer.myTurn = true;
+			player.myTurn = false;
+		}
+		else
+		{
+			player.myTurn = true;
+			Computer.myTurn = false;
+		}
+	}
+}
 void BattleLoop() 
 {
 	if (gameState != GameState::battle)
 	{
 		Gameloop();
 	}
-	if (!player.HasRemainningShips() || !Computer.HasRemainningShips()) 
+	if (!player.HasRemainningShips())
 	{
+		cout << Computer.Name << " WON !!!! " << endl;
 		gameState = GameState::over;
-		Gameloop();
 	}
-	DrawBoards();
+	else if (!Computer.HasRemainningShips())
+	{
+		cout << player.Name << " WON !!!! " << endl;
+		gameState = GameState::over;
+	}
+	else
+	{
+		HandleTurns();
+		if (player.myTurn)
+		{
+			player.ChooseNodeToHit(Computer);
+		}
+		else
+		{
+			Computer.GuessPointOnBoard(player.PlayerBoard.GameBoard, player);
+		}
+		system("pause");
+		DrawBoards();
+	}
+	    Gameloop();
 }
 
 void PlaceShipsLoop()
@@ -90,50 +142,52 @@ void PlaceShipsLoop()
 	}
 	else
 	{
+		cout << " Placment is over - lets battle  " << endl;
 		gameState = GameState::battle;
+		DrawBoards();
 		Gameloop();
 	}
-	PlaceShipsLoop();
+	Gameloop();
 
 
 }
 
 void InitGame()
 {
+    cout << " Welcome to Battleship cpp  " << endl;
+    cout << " The rules are simple, so i will not bother to explain :D " << endl;
+    cout << " Choose your name - dont be a dick and break the game " << endl;
+	cin >> player.Name;
 	SetStartingPlayer();
 	system("pause");
 	DrawBoards();
+	system("pause");
 	gameState = GameState::Placment;
 	Gameloop();
 }
 
 void Gameloop() 
 {
-	while (gameState != GameState::over)
+	
+	switch (gameState)
 	{
-		switch (gameState)
-		{
-		case GameState::init:
-			InitGame();
-			break;
-		case GameState::Placment:
-			PlaceShipsLoop();
-			break;
-		case GameState::battle:
-			BattleLoop();
-			break;
-		case GameState::over:
-			GameOver();
-			break;
-		default:
-			break;
-		}
+	case GameState::init:
+		InitGame();
+		break;
+	case GameState::Placment:
+		PlaceShipsLoop();
+		break;
+	case GameState::battle:
+		BattleLoop();
+		break;
+	case GameState::over:
+		GameOver();
+		break;
+	default:
+		break;
 	}
-	// we should have like 4 functions that run in a loop,
-	// checking if the game is over
-	// asking the player to give input
-	// check the input and act accordinglly
-	// print the result
+	
+
 }
 
 
